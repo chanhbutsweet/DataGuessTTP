@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Bảng dữ liệu</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  padding: 20px;
+}
+
+/* Container */
+.table-wrap {
+  max-width: 1100px;
+  margin: auto;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header */
+thead {
+  background: #f1f3f4;
+}
+
+th {
+  padding: 10px;
+  font-size: 13px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Body */
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* STT column */
+td:first-child {
+  width: 50px;
+  text-align: center;
+  color: #666;
+}
+
+/* Hover giống sheet */
+tbody tr:hover {
+  background: #f5faff;
+}
+
+/* Dropdown style */
+select {
+  width: 100%;
+  padding: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  cursor: pointer;
+}
+
+/* Link */
+a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Badge date */
+.date {
+  background: #e8f0fe;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  margin-top: 15px;
+  color: #888;
+}
+</style>
+</head>
+
+<body>
+
+<h3>📊 Danh sách khách hàng</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr id="thead"></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div id="loading" class="loading">Đang tải...</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyEfVB_H7Nz_dHLcCnmcDtq4pRrIJsYvSpR-FXZKBUceCesFqTD__A-8hjbr1gHX-M9/exec";
+
+function loadData() {
+  // tạo script JSONP mới mỗi lần gọi
+  const script = document.createElement("script");
+  script.src = API_URL + "?callback=renderData&t=" + new Date().getTime(); // chống cache
+  document.body.appendChild(script);
+}
+
+function renderData(data) {
+  const thead = document.getElementById("thead");
+  const tbody = document.getElementById("tbody");
+
+  if (!data.length) return;
+
+  const headers = Object.keys(data[0]);
+
+  // reset bảng trước khi render lại
+  thead.innerHTML = "";
+  tbody.innerHTML = "";
+
+  // HEADER
+  thead.innerHTML = headers.map(h => `<th>${h}</th>`).join("");
+
+  // BODY
+  data.forEach(row => {
+    let tr = "<tr>";
+
+    headers.forEach(h => {
+      let value = row[h] ?? "";
+
+      // trạng thái
+      if (h.toLowerCase().includes("trạng")) {
+        value = `
+          <select>
+            <option value="" ${!row[h] ? "selected" : ""}>---</option>
+            <option value="Đã gọi" ${row[h] === "Đã gọi" ? "selected" : ""}>Đã gọi</option>
+          </select>
+        `;
+      }
+
+       // 👉 NGÀY
+  else if (h.toLowerCase().includes("ngày") && value) {
+    const d = new Date(value);
+
+    const day = d.getUTCDate();
+    const month = d.getUTCMonth() + 1;
+    const year = d.getUTCFullYear();
+
+    value = `<span class="date">${day}/${month}/${year}</span>`;
+    }
+      // người phụ trách
+      else if (h.toLowerCase().includes("phụ trách")) {
+        value = `
+          <select>
+            <option value="" ${!row[h] ? "selected" : ""}>---</option>
+            <option value="Trung" ${row[h] === "Trung" ? "selected" : ""}>Trung</option>
+            <option value="Thanh" ${row[h] === "Thanh" ? "selected" : ""}>Thanh</option>
+          </select>
+        `;
+      }
+
+      tr += `<td>${value}</td>`;
+    });
+
+    tr += "</tr>";
+    tbody.innerHTML += tr;
+  });
+}
+
+// load lần đầu
+loadData();
+
+// 🔁 cứ 3 giây load lại
+setInterval(loadData, 3000);
+</script>
+
+<script src="https://script.google.com/macros/s/AKfycbyEfVB_H7Nz_dHLcCnmcDtq4pRrIJsYvSpR-FXZKBUceCesFqTD__A-8hjbr1gHX-M9/exec?callback=renderData"></script>
+
+</body>
+</html>
