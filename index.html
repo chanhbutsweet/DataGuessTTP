@@ -155,8 +155,8 @@ function renderData(data) {
   else if (h.toLowerCase().includes("ngày") && value) {
     const d = new Date(value);
 
-    const day = d.getUTCDate();
-    const month = d.getUTCMonth() + 1;
+    const day = d.getUTCDate()+1;
+    const month = d.getUTCMonth()+1;
     const year = d.getUTCFullYear();
 
     value = `<span class="date">${day}/${month}/${year}</span>`;
@@ -166,8 +166,9 @@ function renderData(data) {
         value = `
           <select>
             <option value="" ${!row[h] ? "selected" : ""}>---</option>
-            <option value="Trung" ${row[h] === "Trung" ? "selected" : ""}>Trung</option>
-            <option value="Thanh" ${row[h] === "Thanh" ? "selected" : ""}>Thanh</option>
+            <option value="Mr. Trung" ${row[h] === "Mr. Trung" ? "selected" : ""}>Mr. Trung</option>
+            <option value="Mr. Thanh" ${row[h] === "Mr. Thanh" ? "selected" : ""}>Mr. Thanh</option>
+            <option value="Ms. Thu" ${row[h] === "Ms. Thu" ? "selected" : ""}>Ms. Thu</option>
           </select>
         `;
       }
@@ -183,8 +184,8 @@ function renderData(data) {
 // load lần đầu
 loadData();
 
-// 🔁 cứ 3 giây load lại
-setInterval(loadData, 3000);
+// 🔁 cứ 3 m giây load lại
+setInterval(loadData, 300);
 </script>
 
 <script src="https://script.google.com/macros/s/AKfycbyEfVB_H7Nz_dHLcCnmcDtq4pRrIJsYvSpR-FXZKBUceCesFqTD__A-8hjbr1gHX-M9/exec?callback=renderData"></script>
